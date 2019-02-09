@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const {BlogPosts} = require('./models');
+const { BlogPosts } = require('./models');
 
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+
+
+BlogPosts.create('Blog 1', 'Sample content', 'David', 'February 3');
+BlogPosts.create('Blog 2', 'Sample content', 'David', 'February 4');
 
 
 router.get('/', (req, res) => {
