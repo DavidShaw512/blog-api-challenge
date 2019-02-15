@@ -1,2 +1,10 @@
 language: node_js
 node_js: node
+deploy:
+  provider: heroku
+  api_key:
+    secure: W5PoqK/BkHVg5Li4phlrJQRBt8cZBM1nmZdE8j3nNXeG4x/m/r5O2rxTXLVC6uXMneLGtqhpzFkrFzbactwHHMGiyu6lHs2tDtVDlO1PTvL7rfE9uK1y9QX90Dubxl7LpXj76z6TaihyItU/UeOCQ08GLqSDcM+UpmiTpaZeWecxsrHR44ZeWgzgpCWjvTRwMl2sPe8SpQ6/FS/AA8RnrXDJOO8qpnJMvWkkP9Ni73t75qzx4GUOA9bY497TylbMuwsLoEauM60gQP5L5dBzYSk9MwdI2TxZw8rtMJHhdVZ+1IEHCeI9iqWwLbW6CEUM6LkIO7TVuuOy/721KMOuSlhvvy0clf2ZQZ+myArtDoXpZB7GvRUjWaKCf73g9q+R3gwEUk6KBUSDQeea5PrroSpeYjbFut31x430eTlgkBw2bsTSEO7SA6TRF9ZjS5LM/NqK3kOPD6c020iGcGvI+D8zl703Ped1aJTRnQIFM1b047lOUoQ9Qx6cQpzc6bduVMJe7OI4C6O+WV7X4QB+SO5xpNadZ4gN7c3ofv/jCremy99k5mK80wX5b5qLO8Fy+Cqv1WbVW1pzgcJqXgFZ/BbjtjYcSLDx6j/cWeal+nc+3kiSM95DZFpVqRFsZNgiU2SVnrWSLI0sodWTxKyWpCfu5zQfa8U+wFw5DTTaIOs=
+  app: immense-wave-37251
+  on:
+    repo: DavidShaw512/blog-api-challenge
+    branch: myFeature

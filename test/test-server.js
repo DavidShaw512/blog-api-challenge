@@ -29,7 +29,7 @@ describe("Blog", function() {
                 const requiredKeys = ["id", "title", "content", "author", "publishDate"];
                 res.body.forEach(function(item) {
                     expect(item).to.be.a("object");
-                    expect(item).to.include(requiredKeys);
+                    expect(item).to.include.keys(requiredKeys);
                 });
             });
     });
@@ -40,7 +40,7 @@ describe("Blog", function() {
             title: "New Post", 
             content: "New Content", 
             author: "David S.", 
-            publishedDate: "Today" 
+            publishDate: "Today" 
         };
         return chai
             .request(app)
@@ -50,32 +50,49 @@ describe("Blog", function() {
                 expect(res).to.have.status(201);
                 expect(res).to.be.json;
                 expect(res.body).to.be.an("object");
-                expect(res.body).to.include.keys("id", "title", "content", "author", "publishedDate");
+                expect(res.body).to.include.keys("id", "title", "content", "author", "publishDate");
                 expect(res.body.id).to.not.equal(null);
             });
     });
 
     it("should update a particular blog post on PUT", function() {
         // put
-        const updatedBlogPost = {
-            title: "Updated Post",
-            content: "Better Content",
-            author: "Not the last guy",
-            publishedDate: "Tomorrow"
-        };
-        return chai
+        // const updatedBlogPost = {
+        //     title: "Updated Post",
+        //     content: "Better Content",
+        //     author: "Not the last guy",
+        //     publishDate: "Tomorrow"
+        // };
+        // return chai
+        //     .request(app)
+        //     .get("/blog-posts")
+        //     .then(function(res) {
+        //         updatedBlogPost.id = res.body[0].id;
+        //         return chai
+        //             .request(app)
+        //             .post(`/blog-posts/${updatedBlogPost.id}`)
+        //             .send(updatedBlogPost)
+        //     })
+        //     .then(function(res) {
+        //         expect(res).to.have.status(204)
+        //     });
+        return (chai
+        .request(app)
+        // first have to get
+        .get("/blog-posts")
+        .then(function(res) {
+          const updatedPost = Object.assign(res.body[0], {
+            title: "connect the dots",
+            content: "la la la la la"
+          });
+          return chai
             .request(app)
-            .get("/blog-posts")
+            .put(`/blog-posts/${res.body[0].id}`)
+            .send(updatedPost)
             .then(function(res) {
-                updatedBlogPost.id = res.body[0].id;
-                return chai
-                    .request(app)
-                    .post(`/blog-posts/${updatedBlogPost.id}`)
-                    .send(updatedBlogPost)
-            })
-            .then(function(res) {
-                expect(res).to.have.status(204)
+              expect(res).to.have.status(204);
             });
+        }))
     });
 
     it("should delete a particular blog post on DELETE", function() {

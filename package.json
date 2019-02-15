@@ -2,16 +2,18 @@
   "name": "root",
   "version": "1.0.0",
   "description": "",
-  "main": "blogRouter.js",
+  "main": "server.js",
   "scripts": {
     "test": "mocha --exit",
-    "start": "node server.js"
+    "start": "node index.js",
+    "start:dev": "node --inspect index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "chai-http": "^4.2.1",
     "express": "^4.16.4",
+    "mongoose": "^5.4.11",
     "morgan": "^1.9.1",
     "uuid": "^3.3.2"
   },
