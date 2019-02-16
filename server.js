@@ -174,9 +174,10 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
-const { BlogPosts } = require('./models');
+const { Authors, BlogPosts } = require('./models');
 const { PORT, DATABASE_URL } = require('./config');
-// const blogRouter = require('./blogRouter');
+// ADDED COMMENT ROUTER
+// const commentRouter = require('./routers/commentRouter');
 
 const app = express();
 
@@ -184,9 +185,15 @@ mongoose.Promise = global.Promise;
 
 app.use(morgan("common"));
 app.use(express.json());
-// app.use('/blog-posts', blogRouter);
+// ADDED COMMENT ROUTER
+// app.use('/comments', commentRouter);
 
-app.get('/blogPosts', (req, res) => {
+
+// ############################################
+// ############### BLOG POSTS #################
+// ############################################
+
+app.get('/blog-posts', (req, res) => {
     BlogPosts
         .find()
         .then(posts => {
@@ -208,13 +215,13 @@ app.get('/blog-posts/:id', (req, res) => {
         });
 })
 
+
 app.post('/blog-posts', (req, res) => {
     const requiredFields = ["title", "author", "content"];
     for (let i = 0; i < requiredFields.length; i++) {
         const field = requiredFields[i];
         if (!(field in req.body)) {
             const message = `Missing \`${field}\` in request body`;
-            console.log(message);
             console.error(message);
             return res.status(400).send(message);
         }
@@ -232,15 +239,16 @@ app.post('/blog-posts', (req, res) => {
     });
 });
 
+
 app.put('/blog-posts:/id', (req, res) => {
     if(!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         const message = "Request path id and request body id must match";
         console.error(message);
-        return res.status(400).json({ message: message })
+        return res.status(400).json({ message })
     };
 
     const postUpdate = {};
-    const updatableFields = ['title', 'author', 'content'];
+    const updatableFields = ['title', 'content'];
 
     updatableFields.forEach(field => {
         if (field in req.body) {
@@ -257,6 +265,7 @@ app.put('/blog-posts:/id', (req, res) => {
         });
 })
 
+
 app.delete('/blog-posts/:id', (req, res) => {
     BlogPosts
         .findByIdAndDelete(req.params.id)
@@ -267,9 +276,106 @@ app.delete('/blog-posts/:id', (req, res) => {
         });
 })
 
-app.use('*', function(req, res) {
-    req.status(404).json({ message: "Not found"})
+
+// ############################################
+// ################ AUTHORS ###################
+// ############################################
+
+app.post('/authors', (req, res) => {
+    const requiredFields = ["firstName", "lastName", "userName"];
+    for (i = 0; i < requiredFields.length; i += 1) {
+        let field = requiredFields[i];
+        if (!(field in req.body)) {
+            const message = `Missing ${field} in request body!`;
+            console.error(message);
+            return res.status(400).send(message);
+        };
+    };
+
+    Authors
+        .findOne({ userName: req.body.userName })
+        .then(author => {
+            if (author) {
+                const message = `Username already exists`;
+                console.error(message);
+                return res.status(400).send(message);
+            }
+            else {
+                Authors
+                    .create({
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName,
+                        userName: req.body.userName
+                    })
+            }
+        })
+        .then(author => res.status(201).json(author.serialize()))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({message: "Internal server error (author post no good)"});
+        })
 })
+
+app.put('/authors/:id', (req, res) => {
+    if(!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+        const message = "Request path id and request body id must match";
+        console.error(message);
+        return res.status(400).json({ message })
+    };
+
+    const authorUpdates = {};
+    const updateableFields = ["firstName", "lastName", "userName"];
+
+    updateableFields.forEach(field => {
+        if (field in req.body) {
+            authorUpdates[field] = field;
+        }
+    })
+    
+    Authors
+        .findOne({ userName: req.body.userName })
+        .then(author => {
+            if (author) {
+                const message = 'Username already exists';
+                console.error(message);
+                return res.status(400).json({ message });
+            }
+            else {
+                Authors
+                    .findByIdAndUpdate(req.params.id, {$set: authorUpdates})
+                    .then()
+            }
+        
+        })
+        .then(author => res.status(201).json(author.serialize()))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({message: "Internal server error (author update no good)"});
+        });
+});
+
+app.delete('/authors/:id', (req, res) => {
+    BlogPosts
+        .deleteMany({ author: req.params.id })
+        .then(() => {
+            Authors
+                .findByIdAndDelete(req.params.id)
+                .then(() => {
+                    console.log(`Removed author with id ${req.params.id} and all associated blog posts`);
+                    return res.status(204).json({ message: 'Success' });
+                });
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({message: "Internal server error (author delete no good)"});
+        });
+    
+});
+
+
+app.use('*', function(req, res) {
+    res.status(404).json({ message: "Not found"})
+});
 
 let server;
 

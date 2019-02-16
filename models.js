@@ -94,6 +94,16 @@ blogPostSchema.virtual("authorString").get(function() {
     return `${this.author.firstName} ${this.author.lastName}`.trim();
 });
 
+blogPostSchema.pre('findOne', function(next) {
+    this.populate('author');
+    next();
+});
+
+blogPostSchema.pre('find', function(next) {
+    this.populate('author');
+    next();
+});
+
 blogPostSchema.methods.serialize = function() {
     return {
         _id: this._id,
@@ -101,6 +111,14 @@ blogPostSchema.methods.serialize = function() {
         author: this.author,
         content: this.content
     };
+}
+
+authorSchema.methods.serialize = function() {
+    return {
+        _id: this._id,
+        name: `${this.firstName} ${this.lastName}`,
+        userName: this.userName
+    }
 }
 
 const Authors = mongoose.model("Authors", authorSchema)
